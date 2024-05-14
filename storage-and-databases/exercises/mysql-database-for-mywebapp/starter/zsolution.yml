@@ -2,16 +2,9 @@ Parameters:
   EnvironmentName:
     Description: An environment name that will be prefixed to resource names
     Type: String
-
-  ExampleName:
-    Description: Name for this example resources
-    Type: String
-    Default: udacity-rds-example
-
   RdsMasterUsername:
     Type: String
     Description: Username for the RDS database
-
   RdsMasterPassword:
     Type: String
     Description: Password for the RDS database
@@ -20,51 +13,46 @@ Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Ref ExampleName
       GroupDescription: DB Security group for RDS example
       VpcId:
-        Fn::ImportValue: !Sub "${EnvironmentName}-VPCID"
+        Fn::ImportValue: !Sub "${EnvironmentName}-vpc-id"
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 5432
-          ToPort: 5432
+          FromPort: 3306
+          ToPort: 3306
           CidrIp: 10.10.0.0/24
+    DependsOn: DBSubnetGroup
 
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
-      DBSubnetGroupName: !Ref ExampleName
-      DBSubnetGroupDescription: DB subnet group for RDS example
+      DBSubnetGroupDescription: DB subnet group for MyWebApp database
       SubnetIds: !Split
         - ","
-        - Fn::ImportValue: !Sub "${EnvironmentName}-PRIV-NETS"
+        - Fn::ImportValue: !Sub "${EnvironmentName}-private-subnets"
 
   DBParameterGroup:
     Type: AWS::RDS::DBParameterGroup
     Properties:
-      DBParameterGroupName: !Ref ExampleName
       Description: Custom parameter group for RDS example
-      Family: postgres15
+      Family: mysql8.0
       Parameters:
-        synchronous_commit: "off"
-        rds.force_ssl: 1
+        innodb_buffer_pool_instances: 1
+        innodb_buffer_pool_size: 134217728
+        max_connections: 1000
 
   DBInstance:
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Snapshot
     Properties:
       AllocatedStorage: "20"
-      AllowMajorVersionUpgrade: false
-      AutoMinorVersionUpgrade: true
-      DBName: exampledb
+      DBName: mywebapp
       DBInstanceClass: db.t3.micro
-      DBInstanceIdentifier: !Ref ExampleName
-      VPCSecurityGroups:
-        - !Ref SecurityGroup
-      Engine: postgres
-      EngineVersion: "15.4"
+      DBInstanceIdentifier: mywebapp-rds-instance
+      Engine: mysql
+      EngineVersion: "8.0.32"
+      DeletionProtection: true
       DBSubnetGroupName: !Ref DBSubnetGroup
       DBParameterGroupName: !Ref DBParameterGroup
       MasterUsername: !Ref RdsMasterUsername
       MasterUserPassword: !Ref RdsMasterPassword
-      

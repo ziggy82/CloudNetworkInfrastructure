@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "myWebApp"
+  },
+  {
+    "ParameterKey": "RdsMasterUsername",
+    "ParameterValue": "myusername"
+  },
+  {
+    "ParameterKey": "RdsMasterPassword",
+    "ParameterValue": "insertanywildpasswordhere"
+  }
+]
