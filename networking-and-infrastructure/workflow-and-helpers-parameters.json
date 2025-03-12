@@ -1,6 +1,6 @@
 [
-    {
-        "ParameterKey": "EnvironmentName",
-        "ParameterValue": "udacity-workflow-lesson"
-    }
+  {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "udacity-workflow-lesson"
+  }
 ]
